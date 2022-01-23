@@ -13,34 +13,34 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.music.R;
-import com.example.music.databinding.FragmentGalleryBinding;
+import com.example.music.databinding.FragmentArtistBinding;
 
 public class ArtistFragment extends Fragment {
 
-    //private ArtistViewModel artistViewModel;
-    //private FragmentArtistBinding binding;
+    private ArtistViewModel artistViewModel;
+    private FragmentArtistBinding binding;
 
-    //public View onCreateView(@NonNull LayoutInflater inflater,
-    //                         ViewGroup container, Bundle savedInstanceState) {
-    //    ArtistViewModel =
-    //            new ViewModelProvider(this).get(ArtistViewModel.class);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        artistViewModel =
+                new ViewModelProvider(this).get(ArtistViewModel.class);
 
-    //    binding = FragmentArtistBinding.inflate(inflater, container, false);
-    //    View root = binding.getRoot();
+        binding = FragmentArtistBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
-    //   final TextView textView = binding.textArtist;
-    //    ArtistViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-    //       @Override
-    //        public void onChanged(@Nullable String s) {
-    //            textView.setText(s);
-    //        }
-    //    });
-    //    return root;
-    //}
+       final TextView textView = binding.textArtist;
+        artistViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+           @Override
+            public void onChanged(@Nullable String s) {
+                textView.setText(s);
+            }
+        });
+        return root;
+    }
 
-    //@Override
-    //public void onDestroyView() {
-    //    super.onDestroyView();
-    //    binding = null;
-    //}
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

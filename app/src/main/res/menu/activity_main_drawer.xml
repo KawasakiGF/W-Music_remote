@@ -20,5 +20,9 @@
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="アルバム" />
+        <item
+            android:id="@+id/nav_sound"
+
+            android:title="再生画面(debug)" />
     </group>
 </menu>
