@@ -1,44 +1,38 @@
 package com.example.music;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import com.example.music.databinding.ActivityMainBinding;
-import java.io.IOException;
-import android.app.Activity;
-import android.content.res.AssetManager;
-import android.util.Log;
-import android.content.Intent;
-import android.widget.Button;
-import android.widget.EditText;
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.provider.MediaStore;
-import android.widget.Toast;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
-//importしろとは言われてなかったけど、動かないから多少はね？
+import com.example.music.databinding.ActivityMainBinding;
+import com.google.android.material.navigation.NavigationView;
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-//import com.example.music.MediaMetaRetriever;
 
+//importしろとは言われてなかったけど、動かないから多少はね？
+//import com.example.music.MediaMetaRetriever;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -69,13 +63,13 @@ public class MainActivity extends AppCompatActivity {
         /* assets/musicFolder内のファイルをログ表示.*/
         displayAssets("musicFolder");
 
-        /// ストレージへの読み込み許可を取る
-        if (android.os.Build.VERSION.SDK_INT >= 23) {
-            if(androidx.core.app.ActivityCompat.checkSelfPermission(this,
-                    android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != android.content.pm.PackageManager.PERMISSION_GRANTED)
 
-            {
+        // ストレージへの読み込み許可を取る
+
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            if (androidx.core.app.ActivityCompat.checkSelfPermission(this,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 androidx.core.app.ActivityCompat.requestPermissions(this,
                         new String[]{
                                 android.Manifest.permission.READ_EXTERNAL_STORAGE
@@ -85,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //////////////////////////////////</松岡君のやってくれた方法以外で行けそうなの見つけたからそれのテスト
     public static class MusicItem implements Comparable<Object> {
         //Comparable<Object>の定義は結構大事っぽい->何がリストか分からん。items?
         private static final String TAG = "MusicItem";
@@ -112,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public class ArtWork {
-            public Bitmap getArtWork(String filePath){
+            public Bitmap getArtWork(String filePath) {
 
                 Bitmap bm = null; //bmに画像ファイルが入る
 
@@ -131,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
         /**
          * 外部ストレージ上から音楽を探してリストを返す。
+         *
          * @param context コンテキスト
          * @return 見つかった音楽のリスト
          */
@@ -197,13 +191,9 @@ public class MainActivity extends AppCompatActivity {
             return truck - item.truck;
         }
     }
-    //////////////////////////////////松岡君のやってくれた方法以外で行けそうなの見つけたからそれのテスト/>
-
     @SuppressLint("Range")
     @Override
-    public void onRequestPermissionsResult(
-            int requestCode, String[] permission, int[] grantResults
-    ) {
+    public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permission, grantResults);
         if (grantResults.length <= 0) {
             return;
@@ -213,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                     /// 許可が取れた場合・・・
                     /// 必要な処理を書いておく
+                    // Todo ここのメタデータ取得をサービスにして、この部分はサービス開始するだけにしたい
                     ContentResolver contentResolver = getContentResolver();
                     Cursor cursor = null;
                     StringBuilder sb = null;
@@ -220,12 +211,12 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         cursor = contentResolver.query(
                                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                                null,null,null,null);
+                                null, null, null, null);
 
                         if (cursor != null && cursor.moveToFirst()) {
                             ///文字表示用やからこの処理はいらんけど、cursor.getCount()が総曲数をとれるみたいやね
-                            String str =  String.format(
-                                    "MediaStore.Audio = %s\n\n", cursor.getCount() );
+                            String str = String.format(
+                                    "MediaStore.Audio = %s\n\n", cursor.getCount());
 
                             sb = new StringBuilder(str);
 
@@ -240,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
                                 int idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
                                 int idTruck = cursor.getColumnIndex(MediaStore.Audio.Media.TRACK);
                                 int dataColmun = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA);
-
                                 list.add(artistColumn);
                                 list.add(titleColumn);
                                 list.add(albumColumn);
@@ -258,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
                                 sb.append("\n");
                                 sb.append("Path: ");
                                 sb.append(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
+                                Log.d("WATCH_METADATA", cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
                                 sb.append("\n\n");
 
                             } while (cursor.moveToNext());
@@ -273,8 +264,8 @@ public class MainActivity extends AppCompatActivity {
 
                         //MainActivityに戻す
                         finish();
-                    } finally{
-                        if(cursor != null){
+                    } finally {
+                        if (cursor != null) {
                             cursor.close();
                         }
                     }
@@ -290,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -304,11 +296,11 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    private void displayAssets(String dir){
+    private void displayAssets(String dir) {
         AssetManager assetMgr = getResources().getAssets();
         try {
             String musicList[] = assetMgr.list(dir);
-            for(int i = 0; i < musicList.length; i++) {
+            for (int i = 0; i < musicList.length; i++) {
                 Log.d("assets file", musicList[i]);
             }
         } catch (IOException e) {

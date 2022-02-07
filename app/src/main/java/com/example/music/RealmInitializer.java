@@ -1,13 +1,17 @@
 package com.example.music;
 
 import android.app.Application;
+import android.util.Log;
+
 import io.realm.Realm;
 
 public class RealmInitializer extends Application {
+    final String TAG = "RealmInitializer";
     @Override
     public void onCreate(){
         super.onCreate();
         Realm.init(this);
+        Log.d(TAG, "Realm.init 実行");
     }
 }
 /*
