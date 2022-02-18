@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         //ストレージへの読み込み許可を取る
-        if (android.os.Build.VERSION.SDK_INT >= 23 && permission != PackageManager.PERMISSION_GRANTED) {
+        if (permission != PackageManager.PERMISSION_GRANTED) {
             if (androidx.core.app.ActivityCompat.checkSelfPermission(this,
                     android.Manifest.permission.READ_EXTERNAL_STORAGE)
                     != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -84,95 +85,42 @@ public class MainActivity extends AppCompatActivity {
         }
         if (permission == PackageManager.PERMISSION_GRANTED) {
             //ここでストレージ読み込み処理を呼びたい
-/*
-
-            ContentResolver contentResolver = getContentResolver();
-            Cursor cursor = null;
-            StringBuilder sb = null;
-            Log.d("ModelUpdater", "ModelUpdater wad called. ");
-
-            try {
-                cursor = contentResolver.query(
-                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        null, null, null, null);
-
-                String str = String.format(
-                        "MediaStore.Audio = %s\n\n", cursor.getCount());
-                Log.d("getcount","曲数: "+str);
-                int aaa =Integer.parseInt(str);
-                int [aaa][7] datalist;
-                if (cursor != null && cursor.moveToFirst()) {
-                    do {
-*//*
-                    //以下のコメントアウトは参考用に.append(str型のsbに文字を追加処理)のプログラムを残す
-                    sb.append("ID: ");
-                    sb.append(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                    Log.d("WATCH_METADATA", cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                    sb.append("\n");
-                    sb.append("Title: ");
-                    sb.append(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-                    sb.append("\n");
-                    sb.append("Path: ");
-                    sb.append(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
-                    Log.d("WATCH_METADATA", cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
-                    sb.append("\n\n");
-*//*
-
-                    } while (cursor.moveToNext());
-
-                    cursor.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-
-                Toast toast = Toast.makeText(this,
-                        "例外が発生、Permissionを許可していますか？", Toast.LENGTH_SHORT);
-                toast.show();
-
-                //MainActivityに戻す
-                finish();
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
-            }
-            */
             List<MusicItem> Items = MusicItem.getItems(getApplicationContext());
-            RealmAsyncTask transaction = realm.executeTransactionAsync(new Realm.Transaction() {
+            realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
                     Log.d("Realm_ADD", "execute begin");
                     //                   MusicMetaDataModel DataModel = bgRealm.createObject(MusicMetaDataModel.class);
 
-                    int i = 0;
+                    int i;
                     for (i = 0; i < Items.size(); i++) {
                         RealmResults<MusicMetaDataModel> finds = bgRealm.where(MusicMetaDataModel.class).equalTo("path", Items.get(i).path).findAll();
                         if (finds.size() > 0) {//更新処理
 
-                            finds.get(0).artist=Items.get(i).artist;
-                            finds.get(0).truck=Items.get(i).truck;
-                            finds.get(0).title=Items.get(i).title;
-                            finds.get(0).album=Items.get(i).album;
-                            finds.get(0).id=Items.get(i).id;
-                            finds.get(0).duration=Items.get(i).duration;
+                            Objects.requireNonNull(finds.get(0)).artist = Items.get(i).artist;
+                            Objects.requireNonNull(finds.get(0)).truck = Items.get(i).truck;
+                            Objects.requireNonNull(finds.get(0)).title = Items.get(i).title;
+                            Objects.requireNonNull(finds.get(0)).album = Items.get(i).album;
+                            Objects.requireNonNull(finds.get(0)).id = Items.get(i).id;
+                            Objects.requireNonNull(finds.get(0)).duration = Items.get(i).duration;
 
 
                         } else {//追加処理
 
-                            MusicMetaDataModel metadata = bgRealm.createObject(MusicMetaDataModel.class,Items.get(i).path);
+                            MusicMetaDataModel metadata = bgRealm.createObject(MusicMetaDataModel.class, Items.get(i).path);
 
 
-                            metadata.artist=Items.get(i).artist;
-                            metadata.truck=Items.get(i).truck;
-                            metadata.title=Items.get(i).title;
-                            metadata.album=Items.get(i).album;
-                            metadata.id=Items.get(i).id;
-                            metadata.duration=Items.get(i).duration;
+                            metadata.artist = Items.get(i).artist;
+                            metadata.truck = Items.get(i).truck;
+                            metadata.title = Items.get(i).title;
+                            metadata.album = Items.get(i).album;
+                            metadata.id = Items.get(i).id;
+                            metadata.duration = Items.get(i).duration;
                             bgRealm.copyFromRealm(metadata);
 
                         }
                     }
-                    Log.d("Realm_ADD", String.valueOf(i)+" musics are collected");
+                    Log.d("Realm_ADD", i + " musics are collected");
                 }
             }, new Realm.Transaction.OnSuccess() {
                 @Override
@@ -219,39 +167,38 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("Realm_ADD", "execute begin");
                             //                   MusicMetaDataModel DataModel = bgRealm.createObject(MusicMetaDataModel.class);
 
-                            int i = 0;
+                            int i;
                             for (i = 0; i < Items.size(); i++) {
 
-                                Log.d("Realm_ADD", "RealmResults begin");
                                 RealmResults<MusicMetaDataModel> finds = bgRealm.where(MusicMetaDataModel.class).equalTo("path", Items.get(i).path).findAll();
-                                Log.d("Realm_ADD", "RealmResults done");
+
                                 if (finds.size() > 0) {//更新処理
 
-                                    Log.d("Realm_ADD", "if");
-                                    finds.get(0).artist=Items.get(i).artist;
-                                    finds.get(0).truck=Items.get(i).truck;
-                                    finds.get(0).title=Items.get(i).title;
-                                    finds.get(0).album=Items.get(i).album;
-                                    finds.get(0).id=Items.get(i).id;
-                                    finds.get(0).duration=Items.get(i).duration;
+
+                                    Objects.requireNonNull(finds.get(0)).artist = Items.get(i).artist;
+                                    Objects.requireNonNull(finds.get(0)).truck = Items.get(i).truck;
+                                    Objects.requireNonNull(finds.get(0)).title = Items.get(i).title;
+                                    Objects.requireNonNull(finds.get(0)).album = Items.get(i).album;
+                                    Objects.requireNonNull(finds.get(0)).id = Items.get(i).id;
+                                    Objects.requireNonNull(finds.get(0)).duration = Items.get(i).duration;
 
 
-                                    Log.d("Realm_ADD", "set Album-Duration done.");
                                 } else {//追加処理
 
-                                    MusicMetaDataModel metadata = bgRealm.createObject(MusicMetaDataModel.class,Items.get(i).path);
+                                    MusicMetaDataModel metadata = bgRealm.createObject(MusicMetaDataModel.class, Items.get(i).path);
 
 
-                                    metadata.artist=Items.get(i).artist;
-                                    metadata.truck=Items.get(i).truck;
-                                    metadata.title=Items.get(i).title;
-                                    metadata.album=Items.get(i).album;
-                                    metadata.id=Items.get(i).id;
-                                    metadata.duration=Items.get(i).duration;
+                                    metadata.artist = Items.get(i).artist;
+                                    metadata.truck = Items.get(i).truck;
+                                    metadata.title = Items.get(i).title;
+                                    metadata.album = Items.get(i).album;
+                                    metadata.id = Items.get(i).id;
+                                    metadata.duration = Items.get(i).duration;
                                     bgRealm.copyFromRealm(metadata);
 
                                 }
                             }
+                            Log.d("Realm_ADD", i + " musics are collected");
                         }
                     }, new Realm.Transaction.OnSuccess() {
                         @Override
