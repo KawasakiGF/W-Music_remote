@@ -31,7 +31,7 @@ import java.util.Map;
  */
 class MediaMetadataRetriever
 {
-    static {
+        static {
         System.loadLibrary("media_jni");
         native_init();
     }
