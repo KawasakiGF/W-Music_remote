@@ -36,6 +36,9 @@ import com.example.music.databinding.FragmentSoundBinding;
 import com.example.music.MusicMetaDataModel;
 import com.example.music.ui.gallery.GalleryViewModel;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 public class SoundFragment extends Fragment {
 //public class SoundFragment extends AppCompatActivity {
 
@@ -48,6 +51,13 @@ public class SoundFragment extends Fragment {
     public Chronometer durationMax;
     public ImageView button;
     public ImageView jacket;
+
+    //public String path;
+    Realm realm=Realm.getDefaultInstance();
+    //RealmResults<MusicMetaDataModel> wantedMusic = realm.where(MusicMetaDataModel.class).equalTo("path",path).findAll();
+    //long duration=wantedMusic.first().duration;
+    RealmResults<MusicMetaDataModel> allList = realm.where(MusicMetaDataModel.class).findAll();
+    String path = allList.first().path;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -71,14 +81,14 @@ public class SoundFragment extends Fragment {
         //ここのRを通すために26行目にRのimportを入れてる。いや、下のは不要かも
         //setContentView(R.layout.fragment_sound);
         mediaPlayer = null;
-        mediaPlayer = MediaPlayer.create( <<<曲名(title)を入れる>>> );
+        mediaPlayer = MediaPlayer.create(this.getApplication(),path);
         //↑合ってると思うけど、曲名を入れてダメやったらあれやから下に元のプログラムを張っておく。
         //mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.sound);
 
         chronometer = view.findViewById(R.id.chronometer);
         durationMax = view.findViewById(R.id.durationMax);
         //曲の時間をdurationMaxに代入する。
-        durationMax = <<<曲の長さ(duration)をいれる>>>;
+        durationMax.setBase(duration);
 
         // SeekBar
         SeekBar seekBar = view.findViewById(R.id.seekBar);
@@ -114,7 +124,7 @@ public class SoundFragment extends Fragment {
     //seekbarを離した時
     public void onStopTrackingTouch(SeekBar seekBar) {
         //seekのみ行う
-        int msec = (int)<<<曲の長さ(duration)をいれる>>> * seekBar.getProgress() / seekBar.getMax();
+        int msec = (int)duration * seekBar.getProgress() / seekBar.getMax();
         mediaPlayer.seekTo(msec);
         chronometer.setBase(SystemClock.elapsedRealtime() - mediaPlayer.getCurrentPosition());
 
