@@ -29,6 +29,12 @@ import android.widget.ListView;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.widget.TextView;
+import android.widget.Toast;
 
 //public class MyContext {
     //private static MyContext instance = null;
@@ -52,32 +58,34 @@ import android.widget.EditText;
 //}
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment{
 
     private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
-
-        AssetManager assetMgr = getResources().getAssets();
-        try {
-            String[] musicList = assetMgr.list("musicFolder");
-        } catch (IOException e) {
-        }
-
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
 
 
 
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+    //public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //homeViewModel =
+        //        new ViewModelProvider(this).get(HomeViewModel.class);
+
+        //AssetManager assetMgr = getResources().getAssets();
+        //try {
+        //    String[] musicList = assetMgr.list("musicFolder");
+        //} catch (IOException e) {
+        //}
+
+        //binding = FragmentHomeBinding.inflate(inflater, container, false);
+        //View root = binding.getRoot();
+
+
+
+        //final TextView textView = binding.textHome;
+        //homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+            //@Override
+            //public void onChanged(@Nullable String s) {
+                //textView.setText(s);
                 //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 //        getApplicationContext(),
                 //        android.R.layout.simple_list_item_1,    // Androidに組み込まれているレイアウト
@@ -87,12 +95,12 @@ public class HomeFragment extends Fragment {
                 //ListView listView = findViewById(R.id.music_list);
 
                 //listView.setAdapter(arrayAdapter);
-            }
-        });
-        return root;
+            //}
+        //});
+        //return root;
 
 
-    }
+    //}
 
     @Override
     public void onDestroyView() {
